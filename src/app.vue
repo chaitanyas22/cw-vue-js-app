@@ -92,7 +92,7 @@ export default {
         { id: 12, subject: 'Drama', location: 'Kent', price: 17, spaces: 6, icon: 'fas fa-theater-masks' },
         { id: 13, subject: 'Physical Education', location: 'Colindale', price: 28, spaces: 10, icon: 'fas fa-futbol' },
         { id: 14, subject: 'Cooking', location: 'Kingsbury', price: 20, spaces: 4, icon: 'fas fa-utensils' },
-        { id: 15, subject: 'Photography', location: 'Harrow', price: 40, spaces: 2, icon: 'fas fa-camera' },
+        { id: 15, subject: 'Photography', location: 'Harrow', price: 40, spaces: 0, icon: 'fas fa-camera' },
       ],
 
       sortAttribute: 'subject',
