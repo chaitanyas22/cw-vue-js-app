@@ -2,70 +2,83 @@
   <div class="container mt-5">
     <h1 class="text-center mb-4">After School Activities</h1>
 
-    <!-- ---- Search Bar -->
+    <!-- Search Bar -->
     <div class="d-flex justify-content-between mb-3">
-
       <input
-      
         type="text"
         v-model="searchQuery"
         class="form-control w-50"
-
         placeholder="Search for lessons"
       />
-    </div>
-
-    <!-- Sort Section -->
-
-
-
-    <div class="d-flex justify-content-end mb-3">
-      <label for="sort" class="mr-2">Sort By:</label>
-      <select v-model="sortAttribute" class="form-control w-auto mr-2" @change="sortLessons">
-        <option value="subject">Subject</option>
-
-        <option value="location">Location</option>
-        <option value="price">Price</option>
-        <option value="spaces">Spaces</option>
-      </select>
-      <button class="btn btn-primary" @click="toggleSortOrder">
-
-        {{ sortOrder === 'asc' ? 'Ascending' : 'Descending' }}
+      <button
+        class="btn btn-info"
+        :disabled="cart.length === 0"
+        @click="toggleCartView"
+      >
+        {{ showCart ? 'Back to Lessons' : 'View Cart' }}
       </button>
     </div>
 
-    <!---------------------- Lesson Cards -->
-    <div class="row">
-      <LessonCard
-        v-for="lesson in filteredLessons"
-        :key="lesson.id"
-        :lesson="lesson"
-        @add-to-cart="addToCart"
-      />
+    <!-- Lesson Page -->
+
+    <div v-if="!showCart">
+
+
+      <!-- Sort Function -->
+
+
+      <div class="d-flex justify-content-end mb-3">
+
+        <label for="sort" class="mr-2">Sort By:</label>
+        <select v-model="sortAttribute" class="form-control w-auto mr-2" @change="sortLessons">
+          <option value="subject">Subject</option>
+          <option value="location">Location</option>
+          <option value="price">Price</option>
+          <option value="spaces">Spaces</option>
+        </select>
+        <button class="btn btn-primary" @click="toggleSortOrder">
+          {{ sortOrder === 'asc' ? 'Ascending' : 'Descending' }}
+        </button>
+      </div>
+
+      <div class="row">
+        <LessonCard
+          v-for="lesson in filteredLessons"
+          :key="lesson.id"
+          :lesson="lesson"
+          @add-to-cart="addToCart"
+        />
+
+      </div>
     </div>
 
-    <!-- add to cart -->
-
-    <div class="cart mt-5">
-      
-      <h2>Cart</h2>
+    <!-- Shopping Cart Page -->
+    <div v-else>
+      <h2>Your Cart</h2>
       <ul>
         <li v-for="item in cart" :key="item.id">
+
           {{ item.subject }} - {{ item.location }} - ${{ item.price }}
 
-          <button class="btn btn-danger btn-sm ml-2" @click="removeFromCart(item.id)">
+          <button
+            class="btn btn-danger btn-sm ml-2"
+
+            @click="removeFromCart(item.id)"
+          >
             Remove
           </button>
-                   </li>   </ul>
+        </li>
+           
+              </ul>
     </div>
-
-
-
   </div>
+  
 </template>
 
 <script>
 import LessonCard from './components/LessonCard.vue';
+
+
 
 export default {
   name: 'App',
@@ -73,6 +86,7 @@ export default {
   components: {
     LessonCard,
   },
+
   data() 
   {
     return {
@@ -95,10 +109,13 @@ export default {
         { id: 15, subject: 'Photography', location: 'Harrow', price: 40, spaces: 0, icon: 'fas fa-camera' },
       ],
 
+      
+  cart: [],
       sortAttribute: 'subject',
       sortOrder: 'asc',
       searchQuery: '',
-      cart: [],
+
+      showCart: false, // Toggles between Lesson Page and Cart Page
     };
   },
   computed: {
@@ -108,43 +125,48 @@ export default {
       return this.lessons.filter((lesson) =>
         Object.values(lesson).some((value) =>
           value.toString().toLowerCase().includes(query)
-        )
+
+   )
       );
+   
+   
+   
+            },
     },
-  },
   methods: {
     sortLessons() {
-
       const order = this.sortOrder === 'asc' ? 1 : -1;
       this.lessons.sort((a, b) =>
+
         a[this.sortAttribute] > b[this.sortAttribute] ? order : -order
       );
     },
-// sort function
-
     toggleSortOrder() {
       this.sortOrder = this.sortOrder === 'asc' ? 'desc' : 'asc';
       this.sortLessons();
     },
-    // add to cart functionaliry
     addToCart(lesson) {
       if (!this.cart.find((item) => item.id === lesson.id)) {
         this.cart.push(lesson);
-        lesson.spaces -= 1;
-      } else {
+
+        lesson.spaces -= 1; // Decrease available spaces
+             } else {
         alert('This lesson is already in your cart.');
       }
     },
-
-    // remove from cart FUnciton
     removeFromCart(lessonId) {
       const index = this.cart.findIndex((item) => item.id === lessonId);
       if (index !== -1) {
         const lesson = this.cart[index];
-        lesson.spaces += 1;
-        this.cart.splice(index, 1);
+
+        lesson.spaces += 1; // Restore the spaces
+
+        this.cart.splice(index, 1); // Remove from cart
       }
     },
+    toggleCartView() {
+      this.showCart = !this.showCart;
+               },
   },
 };
 </script>
