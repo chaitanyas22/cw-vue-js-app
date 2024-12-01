@@ -1,11 +1,14 @@
 <template>
   <div class="container mt-5">
     <h1 class="text-center mb-4">After School Activities</h1>
+
+    
     <div class="d-flex justify-content-end mb-3">
       <label for="sort" class="mr-2">Sort By:</label>
       <select v-model="sortAttribute" class="form-control w-auto mr-2" @change="sortLessons">
         <option value="subject">Subject</option>
         <option value="location">Location</option>
+
         <option value="price">Price</option>
         <option value="spaces">Spaces</option>
       </select>
@@ -13,12 +16,26 @@
         {{ sortOrder === 'asc' ? 'Ascending' : 'Descending' }}
       </button>
     </div>
+
     <div class="row">
       <LessonCard
         v-for="lesson in lessons"
         :key="lesson.id"
         :lesson="lesson"
+        @add-to-cart="addToCart"
       />
+    </div>
+
+    <div class="cart mt-5">
+      <h2>Cart</h2>
+      <ul>
+        <li v-for="item in cart" :key="item.id">
+          {{ item.subject }} - {{ item.location }} - ${{ item.price }}
+          <button class="btn btn-danger btn-sm ml-2" @click="removeFromCart(item.id)">
+            Remove
+          </button>
+        </li>
+      </ul>
     </div>
   </div>
 </template>
@@ -33,7 +50,9 @@ export default {
   },
   data() {
     return {
-      lessons: [
+      lessons:  [
+
+      // activities 
       { id: 1, subject: 'Math', location: 'Hendon', price: 10, spaces: 5, icon: 'fas fa-calculator' },
         { id: 2, subject: 'Science', location: 'Golders Green', price: 15, spaces: 3, icon: 'fas fa-flask' },
         { id: 3, subject: 'English', location: 'Oxford Street', price: 12, spaces: 4, icon: 'fas fa-book' },
@@ -50,10 +69,17 @@ export default {
         { id: 14, subject: 'Cooking', location: 'Kingsbury', price: 20, spaces: 4, icon: 'fas fa-utensils' },
         { id: 15, subject: 'Photography', location: 'Harrow', price: 40, spaces: 2, icon: 'fas fa-camera' },
       ],
+      cart: [],
       sortAttribute: 'subject',
       sortOrder: 'asc',
+
+
     };
+
   },
+
+
+
   methods: {
     sortLessons() {
       const order = this.sortOrder === 'asc' ? 1 : -1;
@@ -63,7 +89,32 @@ export default {
     },
     toggleSortOrder() {
       this.sortOrder = this.sortOrder === 'asc' ? 'desc' : 'asc';
+
+
       this.sortLessons();
+    },
+    addToCart(lesson) {
+      if (!this.cart.find((item) => item.id === lesson.id))   {
+        this.cart.push(lesson);
+
+        // decrease the spaces 
+        lesson.spaces -= 1; 
+      } else {
+        // aleart if the lesson is already in the cart
+        alert('This lesson is already in your cart.');
+      }
+    },
+
+    // function to remove the itmens from the cart 
+    removeFromCart(lessonId) {
+      const index = this.cart.findIndex((item) => item.id === lessonId);
+      if (index !== -1) {
+        const lesson = this.cart[index];
+
+        lesson.spaces += 1; // Restore thee spaces
+
+        this.cart.splice(index, 1);
+      }
     },
   },
 };
@@ -72,5 +123,10 @@ export default {
 <style scoped>
 h1 {
   color: #4CAF50;
+}
+.cart {
+  background: #f9f9f9;
+  padding: 20px;
+  border-radius: 8px;
 }
 </style>
