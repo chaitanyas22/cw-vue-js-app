@@ -1,13 +1,20 @@
 <template>
-  <div class="col-md-4 mb-3">
+  <div class="col-md-4 mb-4">
     <div class="card">
       <div class="card-body">
         <h5 class="card-title">
           <i :class="lesson.icon"></i> {{ lesson.subject }}
         </h5>
-        <p class="card-text">Location: {{ lesson.location }}</p>
-        <p class="card-text">Price: ${{ lesson.price }}</p>
-        <p class="card-text">Spaces Left: {{ lesson.spaces }}</p>
+        <p class="card-text">
+          <strong>Location:</strong> {{ lesson.location }} <br />
+          <strong>Price:</strong> ${{ lesson.price }} <br />
+          <strong>Spaces Left:</strong> {{ lesson.spaces }}
+        </p>
+
+        <!------add to cart ------->
+        <button class="btn btn-success" @click="addToCart(lesson)">
+          Add to Cart
+        </button>
       </div>
     </div>
   </div>
@@ -15,19 +22,20 @@
 
 <script>
 export default {
-  name: 'LessonCard',
   props: {
-    lesson: Object,
+    lesson: Object
   },
+  methods: {
+    addToCart(lesson) {
+      this.$emit('add-to-cart', lesson);
+    }
+  }
 };
 </script>
 
 <style scoped>
 .card {
   border: 1px solid #ddd;
-  border-radius: 5px;
-}
-.card-title {
-  font-weight: bold;
+  border-radius: 8px;
 }
 </style>
