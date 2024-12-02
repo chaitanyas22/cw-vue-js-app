@@ -139,7 +139,7 @@ export default {
     // Fetch lessons from the backend
     async fetchLessons() {
       try {
-        const response = await fetch('https://aws link');
+        const response = await fetch('https://cw-express-js-app.onrender.com');
         if (!response.ok) {
           throw new Error('Failed to fetch lessons');
         }
