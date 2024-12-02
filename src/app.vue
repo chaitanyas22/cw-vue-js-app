@@ -3,7 +3,6 @@
     <h1 class="text-center mb-4">After School Activities</h1>
 
     <!-- Search Bar and Cart Button -->
-
     <div class="d-flex justify-content-between mb-3">
       <input
         type="text"
@@ -20,7 +19,7 @@
       </button>
     </div>
 
-    <!------------ Lesson Page-------------- -->
+    <!-- Lesson Page -->
     <div v-if="!showCart">
       <!-- Sort Function -->
       <div class="d-flex justify-content-end mb-3">
@@ -39,7 +38,7 @@
       <div class="row">
         <LessonCard
           v-for="lesson in filteredLessons"
-          :key="lesson.id"
+          :key="lesson._id"  <!-- Use MongoDB unique identifier (_id) -->
           :lesson="lesson"
           @add-to-cart="addToCart"
         />
@@ -50,35 +49,28 @@
     <div v-else>
       <h2>Your Cart</h2>
       <ul>
-        <li v-for="item in cart" :key="item.id">
+        <li v-for="item in cart" :key="item._id">
           {{ item.subject }} - {{ item.location }} - ${{ item.price }}
           <button
             class="btn btn-danger btn-sm ml-2"
-            @click="removeFromCart(item.id)"
+            @click="removeFromCart(item._id)"
           >
             Remove
           </button>
         </li>
       </ul>
 
-      <!-- ----------Checkout Section ------>
-
-
-
+      <!-- Checkout Section -->
       <div class="checkout mt-4">
         <h3>Checkout</h3>
-
         <div class="form-group">
-
           <label for="name">Name</label>
           <input
             type="text"
             id="name"
             v-model="customerName"
             class="form-control"
-           
             placeholder="Enter your name"
-
           />
         </div>
         <div class="form-group">
@@ -99,10 +91,7 @@
           Checkout
         </button>
       </div>
-
-
-             </div>
-  
+    </div>
   </div>
 </template>
 
@@ -116,26 +105,7 @@ export default {
   },
   data() {
     return {
-
-      lessons: [
-        { id: 1, subject: 'Math', location: 'Hendon', price: 10, spaces: 5, icon: 'fas fa-calculator' },
-        { id: 2, subject: 'Science', location: 'Golders Green', price: 15, spaces: 3, icon: 'fas fa-flask' },
-        { id: 3, subject: 'English', location: 'Oxford Street', price: 12, spaces: 4, icon: 'fas fa-book' },
-        { id: 4, subject: 'History', location: 'Wembley', price: 18, spaces: 6, icon: 'fas fa-landmark' },
-        { id: 5, subject: 'Geography', location: 'East Ham', price: 14, spaces: 2, icon: 'fas fa-globe' },
-        { id: 6, subject: 'Art', location: 'Hounslow', price: 20, spaces: 5, icon: 'fas fa-palette' },
-        { id: 7, subject: 'Music', location: 'Chancery Lane', price: 25, spaces: 3, icon: 'fas fa-music' },
-        { id: 8, subject: 'Swimming', location: 'Brent Cross', price: 30, spaces: 8, icon: 'fas fa-swimmer' },
-        { id: 9, subject: 'French', location: 'North Finchley', price: 22, spaces: 7, icon: 'fas fa-language' },
-        { id: 10, subject: 'Spanish', location: 'Mile Hill', price: 16, spaces: 4, icon: 'fas fa-language' },
-        { id: 11, subject: 'Computer Science', location: 'Uxbridge', price: 35, spaces: 5, icon: 'fas fa-laptop-code' },
-        { id: 12, subject: 'Drama', location: 'Kent', price: 17, spaces: 6, icon: 'fas fa-theater-masks' },
-        { id: 13, subject: 'Physical Education', location: 'Colindale', price: 28, spaces: 10, icon: 'fas fa-futbol' },
-        { id: 14, subject: 'Cooking', location: 'Kingsbury', price: 20, spaces: 4, icon: 'fas fa-utensils' },
-        { id: 15, subject: 'Photography', location: 'Harrow', price: 40, spaces: 0, icon: 'fas fa-camera' },
-      ],
-
-      
+      lessons: [],  // Initially empty, will be populated by fetch call
       cart: [],
       sortAttribute: 'subject',
       sortOrder: 'asc',
@@ -151,19 +121,14 @@ export default {
       return this.lessons.filter((lesson) =>
         Object.values(lesson).some((value) =>
           value.toString().toLowerCase().includes(query)
-
-        ) );
+        )
+      );
     },
-
-
     isCheckoutValid() {
-
-
       const nameRegex = /^[A-Za-z\s]+$/;
       const phoneRegex = /^[0-9]+$/;
       return (
         nameRegex.test(this.customerName) &&
-
         phoneRegex.test(this.customerPhone) &&
         this.customerName.length > 0 &&
         this.customerPhone.length > 0
@@ -171,30 +136,39 @@ export default {
     },
   },
   methods: {
-    sortLessons() {
+    // Fetch lessons from the backend
+    async fetchLessons() {
+      try {
+        const response = await fetch('https://aws link');
+        if (!response.ok) {
+          throw new Error('Failed to fetch lessons');
+        }
+        this.lessons = await response.json();  // Set lessons from the API
+      } catch (error) {
+        console.error(error);
+      }
+    },
 
+    sortLessons() {
       const order = this.sortOrder === 'asc' ? 1 : -1;
       this.lessons.sort((a, b) =>
         a[this.sortAttribute] > b[this.sortAttribute] ? order : -order
       );
     },
     toggleSortOrder() {
-
       this.sortOrder = this.sortOrder === 'asc' ? 'desc' : 'asc';
       this.sortLessons();
     },
     addToCart(lesson) {
-      if (!this.cart.find((item) => item.id === lesson.id)) {
+      if (!this.cart.find((item) => item._id === lesson._id)) {
         this.cart.push(lesson);
-
         lesson.spaces -= 1; // Decrease available spaces
       } else {
         alert('This lesson is already in your cart.');
       }
     },
     removeFromCart(lessonId) {
-
-      const index = this.cart.findIndex((item) => item.id === lessonId);
+      const index = this.cart.findIndex((item) => item._id === lessonId);
       if (index !== -1) {
         const lesson = this.cart[index];
         lesson.spaces += 1; // Restore the spaces
@@ -203,7 +177,6 @@ export default {
     },
     toggleCartView() {
       this.showCart = !this.showCart;
-
     },
     submitOrder() {
       alert(`Thank you for your order, ${this.customerName}!`);
@@ -211,12 +184,11 @@ export default {
       this.customerName = ''; // Clear the name field
       this.customerPhone = ''; // Clear the phone field
       this.showCart = false; // Return to lesson page
- },
-
-
+    },
   },
-
-
+  mounted() {
+    this.fetchLessons();  // Fetch lessons when the component is mounted
+  },
 };
 </script>
 
@@ -227,10 +199,10 @@ h1 {
 
 .cart {
   background: #f9f9f9;
-
   padding: 20px;
   border-radius: 8px;
 }
+
 .checkout {
   background: #fff;
   padding: 15px;
